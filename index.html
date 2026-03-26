@@ -725,8 +725,8 @@
     .empty-state-text { font-size: 14px; }
 
     /* Highlight filter dim */
-    .tech-row.dimmed { opacity: 0.25; }
-    .sector-card.dimmed { opacity: 0.3; }
+    .tech-row.dimmed { opacity: 0.2; transition: opacity 0.2s; }
+    .sector-card.dimmed, .matrix-table tbody tr.dimmed, .bubble.dimmed, .bar-row.dimmed { opacity: 0.2; transition: opacity 0.2s; }
   </style>
 </head>
 <body>
@@ -870,6 +870,20 @@ function buildLawFilters() {
       </div>
       <div class="law-chip-count">${count}</div>
     `;
+    el.onmouseenter = () => {
+      document.querySelectorAll('.sector-card, .matrix-table tbody tr, .bubble, .tech-row').forEach(el => {
+        el.classList.toggle('dimmed', !el.dataset.laws?.split(',').includes(k));
+      });
+      document.querySelectorAll('.bar-row[data-law]').forEach(el => {
+        el.classList.toggle('dimmed', el.dataset.law !== k);
+      });
+      document.querySelectorAll('.bar-row[data-laws]').forEach(el => {
+        el.classList.toggle('dimmed', !el.dataset.laws.split(',').includes(k));
+      });
+    };
+    el.onmouseleave = () => {
+      document.querySelectorAll('.sector-card, .matrix-table tbody tr, .bubble, .bar-row, .tech-row').forEach(el => el.classList.remove('dimmed'));
+    };
     el.onclick = () => {
       if (state.activeLaws.has(k)) {
         if (state.activeLaws.size > 1) state.activeLaws.delete(k);
@@ -877,7 +891,7 @@ function buildLawFilters() {
         state.activeLaws.add(k);
       }
       buildLawFilters();
-            render();
+      render();
     };
     container.appendChild(el);
   });
@@ -926,6 +940,7 @@ function renderOverview(main, rcDiv) {
     const filteredCount = s.subsectors.reduce((a, ss) => a + ss.items.filter(i => techMatchesFilter(i)).length, 0);
     const card = document.createElement('div');
     card.className = 'sector-card';
+    card.dataset.laws = LAW_KEYS.filter(k => coverage.has(k)).join(',');
     const dots = LAW_KEYS.map(k => {
       const cls = coverage.has(k) ? `on-${LAW_CLASSES[k]}` : 'off';
       return `<div class="card-dot ${cls}" title="${LAW_SHORT[k]}"></div>`;
@@ -994,6 +1009,7 @@ function renderDetail(main, rcDiv) {
     visibleItems.forEach(item => {
       const row = document.createElement('div');
       row.className = 'tech-row';
+      row.dataset.laws = LAW_KEYS.filter(k => item.laws[k]).join(',');
       const pills = LAW_KEYS.filter(k => item.laws[k] && state.activeLaws.has(k)).map(k =>
         `<span class="tl-pill tl-${LAW_CLASSES[k]}">${LAW_SHORT[k]}</span>`
       ).join('');
@@ -1026,7 +1042,7 @@ function renderMatrix(main, rcDiv) {
     }).join('');
     const cnt = s.subsectors.reduce((a, ss) => a + ss.items.filter(i => techMatchesFilter(i)).length, 0);
     rows += `
-      <tr style="cursor:pointer" onclick="state.activeSector=${s.id};state.view='overview';render()">
+      <tr style="cursor:pointer" data-laws="${LAW_KEYS.filter(k => coverage.has(k)).join(',')}" onclick="state.activeSector=${s.id};state.view='overview';render()">
         <td class="sector-td">${s.icon} ${s.name}</td>
         ${cells}
         <td style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--accent);text-align:center">${cnt}</td>
@@ -1074,7 +1090,7 @@ function renderStats(main, rcDiv) {
     const pct = Math.round(lawTechCounts[k] / countTechs() * 100);
     const cls = LAW_CLASSES[k];
     return `
-      <div class="bar-row">
+      <div class="bar-row" data-law="${k}">
         <div class="bar-label">${LAW_SHORT[k]}</div>
         <div class="bar-track">
           <div class="bar-fill bar-fill-${cls}" style="width:${pct}%">${lawTechCounts[k]}</div>
@@ -1100,7 +1116,7 @@ function renderStats(main, rcDiv) {
     const size = 28 + (s.techCount / maxTech) * 32;
     const fontSize = Math.max(12, size * 0.3);
     return `
-      <div class="bubble" onclick="state.activeSector=${s.id};state.view='overview';render()" title="${s.name}: ${s.techCount}개 세부기술, ${s.lawCount}개 법령">
+      <div class="bubble" data-laws="${LAW_KEYS.filter(k => s.subsectors.some(ss => ss.items.some(i => i.laws[k]))).join(',')}" onclick="state.activeSector=${s.id};state.view='overview';render()" title="${s.name}: ${s.techCount}개 세부기술, ${s.lawCount}개 법령">
         <div class="bubble-circle" style="width:${size}px;height:${size}px;font-size:${fontSize}px;border-color:${getLawColor(LAW_KEYS[s.lawCount-1]||'strategic')};background:${getLawColor(LAW_KEYS[s.lawCount-1]||'strategic')}22">${s.techCount}</div>
         <div class="bubble-icon">${s.icon}</div>
         <div class="bubble-name">${s.name}</div>
@@ -1109,15 +1125,15 @@ function renderStats(main, rcDiv) {
   }).join('');
 
   // Law overlap
-  const both = {};
+  const bothArr = [];
   LAW_KEYS.forEach((k1,i) => LAW_KEYS.slice(i+1).forEach(k2 => {
     const cnt = TECH_DATA.sectors.reduce((a,s) => a + s.subsectors.reduce((a2,ss) => a2 + ss.items.filter(i=>i.laws[k1]&&i.laws[k2]).length, 0), 0);
-    if (cnt > 0) both[`${LAW_SHORT[k1]} + ${LAW_SHORT[k2]}`] = cnt;
+    if (cnt > 0) bothArr.push({ pair: `${LAW_SHORT[k1]} + ${LAW_SHORT[k2]}`, keys: `${k1},${k2}`, cnt });
   }));
-  const overlapEntries = Object.entries(both).sort((a,b)=>b[1]-a[1]);
-  const maxOverlap = overlapEntries.length > 0 ? overlapEntries[0][1] : 1;
-  const overlapRows = overlapEntries.map(([pair, cnt]) =>
-    `<div class="bar-row"><div class="bar-label" style="width:200px;font-size:10px">${pair}</div><div class="bar-track"><div class="bar-fill bar-fill-b" style="width:${cnt/maxOverlap*100}%">${cnt}</div></div></div>`
+  bothArr.sort((a,b) => b.cnt - a.cnt);
+  const maxOverlap = bothArr.length > 0 ? bothArr[0].cnt : 1;
+  const overlapRows = bothArr.map(({ pair, keys, cnt }) =>
+    `<div class="bar-row" data-laws="${keys}"><div class="bar-label" style="width:200px;font-size:10px">${pair}</div><div class="bar-track"><div class="bar-fill bar-fill-b" style="width:${cnt/maxOverlap*100}%">${cnt}</div></div></div>`
   ).join('');
 
   main.innerHTML = `
