@@ -1226,6 +1226,41 @@ function hasAnyChosung(q) {
   return [...q].some(ch => CHOSUNG_SET.has(ch));
 }
 
+// ─── 영타 → 한글 변환 ───
+const EN2KR = {q:'ㅂ',w:'ㅈ',e:'ㄷ',r:'ㄱ',t:'ㅅ',y:'ㅛ',u:'ㅕ',i:'ㅑ',o:'ㅐ',p:'ㅔ',a:'ㅁ',s:'ㄴ',d:'ㅇ',f:'ㄹ',g:'ㅎ',h:'ㅗ',j:'ㅓ',k:'ㅏ',l:'ㅣ',z:'ㅋ',x:'ㅌ',c:'ㅊ',v:'ㅍ',b:'ㅠ',n:'ㅜ',m:'ㅡ',Q:'ㅃ',W:'ㅉ',E:'ㄸ',R:'ㄲ',T:'ㅆ',O:'ㅒ',P:'ㅖ'};
+const CHO_S = 'ㄱㄲㄴㄷㄸㄹㅁㅂㅃㅅㅆㅇㅈㅉㅊㅋㅌㅍㅎ';
+const JUNG_S = 'ㅏㅐㅑㅒㅓㅔㅕㅖㅗㅘㅙㅚㅛㅜㅝㅞㅟㅠㅡㅢㅣ';
+const JONG_S = '\0ㄱㄲㄳㄴㄵㄶㄷㄹㄺㄻㄼㄽㄾㄿㅀㅁㅂㅄㅅㅆㅇㅈㅊㅋㅌㅍㅎ';
+const CJ = {'ㅗㅏ':'ㅘ','ㅗㅐ':'ㅙ','ㅗㅣ':'ㅚ','ㅜㅓ':'ㅝ','ㅜㅔ':'ㅞ','ㅜㅣ':'ㅟ','ㅡㅣ':'ㅢ'};
+const CK = {'ㄱㅅ':'ㄳ','ㄴㅈ':'ㄵ','ㄴㅎ':'ㄶ','ㄹㄱ':'ㄺ','ㄹㅁ':'ㄻ','ㄹㅂ':'ㄼ','ㄹㅅ':'ㄽ','ㄹㅌ':'ㄾ','ㄹㅍ':'ㄿ','ㄹㅎ':'ㅀ','ㅂㅅ':'ㅄ'};
+const SK = Object.fromEntries(Object.entries(CK).map(([k,v])=>[v,k]));
+
+function engToKor(text) {
+  const jamo = [...text].map(ch => EN2KR[ch] || ch);
+  const mk = (c,j,k) => String.fromCharCode(0xAC00 + CHO_S.indexOf(c)*588 + JUNG_S.indexOf(j)*28 + (k ? JONG_S.indexOf(k) : 0));
+  let res = '', cho = null, jung = null, jong = null;
+  const flush = () => { if (cho !== null) res += jung !== null ? mk(cho, jung, jong) : cho; cho = jung = jong = null; };
+  for (const ch of jamo) {
+    const isC = CHO_S.includes(ch), isJ = JUNG_S.includes(ch);
+    if (!isC && !isJ) { flush(); res += ch; continue; }
+    if (cho === null) { if (isC) cho = ch; else res += ch; }
+    else if (jung === null) { if (isJ) jung = ch; else { res += cho; cho = ch; } }
+    else if (jong === null) {
+      if (isJ) { const c = CJ[jung+ch]; if (c) jung = c; else { flush(); res += ch; } }
+      else if (JONG_S.includes(ch)) jong = ch;
+      else { flush(); cho = ch; }
+    } else {
+      if (isJ) {
+        const s = SK[jong];
+        if (s) { res += mk(cho, jung, s[0]); cho = s[1]; } else { res += mk(cho, jung, null); cho = jong; }
+        jung = ch; jong = null;
+      } else { const c = CK[jong+ch]; if (c && JONG_S.includes(c)) jong = c; else { res += mk(cho, jung, jong); cho = ch; jung = jong = null; } }
+    }
+  }
+  flush();
+  return res;
+}
+
 // 전처리: 아이템별 검색 인덱스 생성
 TECH_DATA.sectors.forEach(s => s.subsectors.forEach(ss => ss.items.forEach(item => {
   item._si = buildSearchIndex(item.name + ' ' + ss.name);
@@ -1250,14 +1285,17 @@ function highlightToken(text, siName, token) {
 }
 
 function renderSearch(main, rcDiv) {
-  const tokens = state.searchQuery.split(/\s+/).filter(t => t.length > 0);
+  const origTokens = state.searchQuery.split(/\s+/).filter(t => t.length > 0);
+  const krTokens = engToKor(state.searchQuery).split(/\s+/).filter(t => t.length > 0);
   const results = [];
   TECH_DATA.sectors.forEach(s => {
     s.subsectors.forEach(ss => {
       ss.items.forEach(item => {
         if (!techMatchesFilter(item)) return;
-        if (tokens.every(t => tokenMatch(item._si, t) >= 0)) {
-          results.push({ sector: s, subsector: ss, item });
+        const origOk = origTokens.every(t => tokenMatch(item._si, t) >= 0);
+        const krOk = !origOk && krTokens.every(t => tokenMatch(item._si, t) >= 0);
+        if (origOk || krOk) {
+          results.push({ sector: s, subsector: ss, item, _tokens: origOk ? origTokens : krTokens });
         }
       });
     });
@@ -1272,7 +1310,7 @@ function renderSearch(main, rcDiv) {
 
   const html = results.map(r => {
     let name = r.item.name;
-    for (const t of tokens) {
+    for (const t of r._tokens) {
       const h = highlightToken(name, buildSearchIndex(name), t);
       if (h) name = h;
     }
