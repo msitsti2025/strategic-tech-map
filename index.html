@@ -196,35 +196,6 @@
     }
 
     /* Sector list */
-    .sector-list { display: flex; flex-direction: column; gap: 2px; }
-
-    .sector-item {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      padding: 7px 10px;
-      border-radius: 6px;
-      cursor: pointer;
-      transition: all 0.15s;
-      font-size: 12px;
-      color: var(--text-dim);
-      border: 1px solid transparent;
-    }
-
-    .sector-item:hover { background: var(--bg3); color: var(--text); }
-    .sector-item.active { background: #1e3a5f33; border-color: var(--accent); color: var(--accent); }
-
-    .sector-icon { font-size: 14px; width: 20px; text-align: center; }
-
-    .sector-count {
-      margin-left: auto;
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 10px;
-      background: var(--bg3);
-      padding: 1px 5px;
-      border-radius: 4px;
-    }
-
     /* Search */
     .search-wrap {
       position: relative;
@@ -787,18 +758,12 @@
       <div class="law-filter" id="law-filters"></div>
     </div>
 
-    <!-- Sector nav -->
-    <div class="sidebar-section">
-      <div class="sidebar-label">기술 분야 (19개)</div>
-      <div class="sector-list" id="sector-nav"></div>
-    </div>
   </sidebar>
 
   <div style="display:flex; flex-direction:column;">
     <!-- Control bar -->
     <div class="control-bar">
       <div class="result-count" id="result-count"></div>
-      <div class="tag-list" id="active-tags"></div>
     </div>
 
     <!-- Main -->
@@ -855,8 +820,7 @@ function sectorMatchesFilter(sector) {
 function init() {
   document.getElementById('h-techs').textContent = countTechs();
   buildLawFilters();
-  buildSectorNav();
-  render();
+    render();
 
   document.getElementById('search-input').addEventListener('input', (e) => {
     state.searchQuery = e.target.value.trim();
@@ -891,42 +855,12 @@ function buildLawFilters() {
         state.activeLaws.add(k);
       }
       buildLawFilters();
-      buildSectorNav();
-      render();
+            render();
     };
     container.appendChild(el);
   });
 }
 
-function buildSectorNav() {
-  const container = document.getElementById('sector-nav');
-  container.innerHTML = '';
-  TECH_DATA.sectors.forEach(s => {
-    const visible = sectorMatchesFilter(s);
-    const el = document.createElement('div');
-    el.className = `sector-item${state.activeSector === s.id ? ' active' : ''}`;
-    const cnt = s.subsectors.reduce((a, ss) => a + ss.items.filter(i => techMatchesFilter(i)).length, 0);
-    el.innerHTML = `
-      <span class="sector-icon">${s.icon}</span>
-      <span>${s.name}</span>
-      <span class="sector-count">${cnt}</span>
-    `;
-    el.style.opacity = visible ? '1' : '0.3';
-    el.onclick = () => {
-      if (state.activeSector === s.id) {
-        state.activeSector = null;
-      } else {
-        state.activeSector = s.id;
-        state.view = 'overview';
-      }
-      state.searchQuery = '';
-      document.getElementById('search-input').value = '';
-      buildSectorNav();
-      render();
-    };
-    container.appendChild(el);
-  });
-}
 
 function setView(v) {
   state.view = v;
@@ -936,33 +870,13 @@ function setView(v) {
   document.querySelectorAll('.view-btn').forEach((b, i) => {
     b.classList.toggle('active', ['overview','matrix','stats'][i] === v);
   });
-  buildSectorNav();
-  render();
+    render();
 }
 
 // ─── RENDER ───
 function render() {
   const main = document.getElementById('main-content');
   const rcDiv = document.getElementById('result-count');
-  const tagDiv = document.getElementById('active-tags');
-
-  // Active tags
-  tagDiv.innerHTML = '';
-  LAW_KEYS.filter(k => state.activeLaws.has(k)).forEach(k => {
-    const tag = document.createElement('span');
-    const cls = LAW_CLASSES[k];
-    tag.className = `tag tag-${cls}`;
-    tag.textContent = LAW_SHORT[k];
-    tag.onclick = () => {
-      if (state.activeLaws.size > 1) {
-        state.activeLaws.delete(k);
-        buildLawFilters();
-        buildSectorNav();
-        render();
-      }
-    };
-    tagDiv.appendChild(tag);
-  });
 
   if (state.searchQuery.length >= 1) {
     renderSearch(main, rcDiv);
@@ -1004,8 +918,7 @@ function renderOverview(main, rcDiv) {
     `;
     card.onclick = () => {
       state.activeSector = s.id;
-      buildSectorNav();
-      render();
+            render();
     };
     grid.appendChild(card);
   });
