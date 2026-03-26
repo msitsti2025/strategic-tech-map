@@ -77,10 +77,11 @@
     .header-stats {
       display: flex;
       gap: 20px;
+      align-items: center;
     }
 
     .hstat {
-      text-align: right;
+      text-align: center;
     }
 
     .hstat-num {
@@ -735,9 +736,9 @@
   <sidebar>
     <!-- Search -->
     <div class="sidebar-section">
-      <div class="sidebar-label">🔍 세부기술 검색</div>
+      <div class="sidebar-label">세부기술 검색</div>
       <div class="search-wrap">
-        <span class="search-icon">⌕</span>
+        <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
         <input type="text" class="search-input" id="search-input" placeholder="기술명 검색..." />
       </div>
     </div>
@@ -746,7 +747,7 @@
     <div class="sidebar-section">
       <div class="sidebar-label">보기 방식</div>
       <div class="view-btns">
-        <button class="view-btn active" onclick="setView('overview')">카드뷰</button>
+        <button class="view-btn active" onclick="setView('overview')">분류</button>
         <button class="view-btn" onclick="setView('matrix')">매트릭스</button>
         <button class="view-btn" onclick="setView('stats')">통계</button>
       </div>
@@ -894,7 +895,7 @@ function render() {
 function renderOverview(main, rcDiv) {
   const sectors = TECH_DATA.sectors.filter(s => sectorMatchesFilter(s));
   const totalTechs = sectors.reduce((a, s) => a + s.subsectors.reduce((a2, ss) => a2 + ss.items.filter(i => techMatchesFilter(i)).length, 0), 0);
-  rcDiv.innerHTML = `표시 중: <strong>${sectors.length}</strong>개 분야 · <strong>${totalTechs}</strong>개 세부기술`;
+  rcDiv.innerHTML = `분류 · <strong>${sectors.length}</strong>개 분야 · <strong>${totalTechs}</strong>개 세부기술`;
 
   main.innerHTML = `<div class="overview-grid" id="cards-grid"></div>`;
   const grid = document.getElementById('cards-grid');
@@ -989,7 +990,7 @@ function renderDetail(main, rcDiv) {
 
 function renderMatrix(main, rcDiv) {
   const sectors = TECH_DATA.sectors.filter(s => sectorMatchesFilter(s));
-  rcDiv.innerHTML = `매트릭스 뷰: <strong>${sectors.length}</strong>개 분야 × <strong>5</strong>개 법령`;
+  rcDiv.innerHTML = `매트릭스 · <strong>${sectors.length}</strong>개 분야 · <strong>5</strong>개 법령`;
 
   const lawHeaders = LAW_KEYS.map(k =>
     `<th class="law-th">${LAW_SHORT[k]}</th>`
@@ -1031,7 +1032,7 @@ function renderMatrix(main, rcDiv) {
 }
 
 function renderStats(main, rcDiv) {
-  rcDiv.innerHTML = `통계 · 전체 <strong>${countTechs()}</strong>개 세부기술`;
+  rcDiv.innerHTML = `통계 · <strong>${countTechs()}</strong>개 세부기술`;
 
   // Compute per-law sector coverage counts
   const lawSectorCounts = {};
@@ -1226,7 +1227,7 @@ function renderSearch(main, rcDiv) {
     });
   });
 
-  rcDiv.innerHTML = `검색 "<strong>${state.searchQuery}</strong>" · <strong>${results.length}</strong>개 결과`;
+  rcDiv.innerHTML = `검색 · "<strong>${state.searchQuery}</strong>" · <strong>${results.length}</strong>개 결과`;
 
   if (results.length === 0) {
     main.innerHTML = `<div class="empty-state"><div class="empty-state-icon">🔍</div><div class="empty-state-text">검색 결과가 없습니다.</div></div>`;
