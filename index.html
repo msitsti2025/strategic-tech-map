@@ -725,8 +725,9 @@
     .empty-state-text { font-size: 14px; }
 
     /* Highlight filter dim */
-    .tech-row.dimmed { opacity: 0.2; transition: opacity 0.2s; }
-    .sector-card.dimmed, .matrix-table tbody tr.dimmed, .bubble.dimmed, .bar-row.dimmed { opacity: 0.2; transition: opacity 0.2s; }
+    .tech-row.dimmed { opacity: 0.2; }
+    .sector-card, .matrix-table tbody tr, .bubble, .bar-row, .tech-row { transition: opacity 0.3s; }
+    .sector-card.dimmed, .matrix-table tbody tr.dimmed, .bubble.dimmed, .bar-row.dimmed { opacity: 0.2; }
   </style>
 </head>
 <body>
@@ -798,7 +799,8 @@ let state = {
   view: 'overview',
   activeLaws: new Set(['strategic','tax_strategic','tax_growth','advanced','protection']),
   activeSector: null,
-  searchQuery: ''
+  searchQuery: '',
+  hoveredLaw: null
 };
 
 const LAW_KEYS = ['strategic','tax_strategic','tax_growth','advanced','protection'];
@@ -870,20 +872,8 @@ function buildLawFilters() {
       </div>
       <div class="law-chip-count">${count}</div>
     `;
-    el.onmouseenter = () => {
-      document.querySelectorAll('.sector-card, .matrix-table tbody tr, .bubble, .tech-row').forEach(el => {
-        el.classList.toggle('dimmed', !el.dataset.laws?.split(',').includes(k));
-      });
-      document.querySelectorAll('.bar-row[data-law]').forEach(el => {
-        el.classList.toggle('dimmed', el.dataset.law !== k);
-      });
-      document.querySelectorAll('.bar-row[data-laws]').forEach(el => {
-        el.classList.toggle('dimmed', !el.dataset.laws.split(',').includes(k));
-      });
-    };
-    el.onmouseleave = () => {
-      document.querySelectorAll('.sector-card, .matrix-table tbody tr, .bubble, .bar-row, .tech-row').forEach(el => el.classList.remove('dimmed'));
-    };
+    el.onmouseenter = () => { state.hoveredLaw = k; applyLawHighlight(); };
+    el.onmouseleave = () => { state.hoveredLaw = null; applyLawHighlight(); };
     el.onclick = () => {
       if (state.activeLaws.has(k)) {
         if (state.activeLaws.size > 1) state.activeLaws.delete(k);
@@ -909,6 +899,21 @@ function setView(v) {
     render();
 }
 
+function applyLawHighlight() {
+  const k = state.hoveredLaw;
+  const all = document.querySelectorAll('.sector-card, .matrix-table tbody tr, .bubble, .bar-row, .tech-row');
+  if (!k) { all.forEach(el => el.classList.remove('dimmed')); return; }
+  document.querySelectorAll('.sector-card, .matrix-table tbody tr, .bubble, .tech-row').forEach(el => {
+    el.classList.toggle('dimmed', !el.dataset.laws?.split(',').includes(k));
+  });
+  document.querySelectorAll('.bar-row[data-law]').forEach(el => {
+    el.classList.toggle('dimmed', el.dataset.law !== k);
+  });
+  document.querySelectorAll('.bar-row[data-laws]').forEach(el => {
+    el.classList.toggle('dimmed', !el.dataset.laws.split(',').includes(k));
+  });
+}
+
 // ─── RENDER ───
 function render() {
   const main = document.getElementById('main-content');
@@ -925,6 +930,7 @@ function render() {
   } else {
     renderOverview(main, rcDiv);
   }
+  applyLawHighlight();
 }
 
 function renderOverview(main, rcDiv) {
@@ -1102,7 +1108,7 @@ function renderStats(main, rcDiv) {
   const sectorBars = sectorCoverage.slice(0,10).map(s => {
     const pct = Math.round(s.techCount / maxTech * 100);
     return `
-      <div class="bar-row">
+      <div class="bar-row" data-laws="${LAW_KEYS.filter(k => s.subsectors.some(ss => ss.items.some(i => i.laws[k]))).join(',')}">
         <div class="bar-label" style="font-size:10px">${s.icon} ${s.name}</div>
         <div class="bar-track">
           <div class="bar-fill bar-fill-a" style="width:${pct}%;background:linear-gradient(90deg,var(--law-a),var(--law-b))">${s.techCount}</div>
