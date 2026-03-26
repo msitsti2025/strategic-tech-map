@@ -42,6 +42,8 @@
 strategic-tech-map/
 ├── index.html    # 메인 앱 (단일 파일)
 ├── data.js       # 전략기술 데이터
+├── map3d.html    # 2026년 정부 R&D 예산 3D 시각화
+├── map3d.json    # 3D 시각화용 데이터
 └── README.md
 ```
 
