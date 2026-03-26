@@ -667,9 +667,10 @@
 
     .bubble-chart {
       display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      align-items: flex-end;
+      flex-wrap: nowrap;
+      gap: 6px;
+      align-items: flex-start;
+      justify-content: center;
     }
 
     .bubble {
@@ -678,6 +679,8 @@
       align-items: center;
       cursor: pointer;
       transition: transform 0.2s;
+      flex: 1 1 0;
+      min-width: 0;
     }
 
     .bubble:hover { transform: scale(1.08); }
@@ -687,19 +690,25 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 10px;
       font-weight: 700;
       font-family: 'JetBrains Mono', monospace;
       color: #fff;
       border: 2px solid;
     }
 
+    .bubble-icon {
+      margin-top: 6px;
+      font-size: 14px;
+      line-height: 1;
+    }
+
     .bubble-name {
-      font-size: 9px;
+      font-size: 11px;
       color: var(--text-dim);
       text-align: center;
-      margin-top: 4px;
-      max-width: 60px;
+      margin-top: 2px;
+      word-break: keep-all;
+      line-height: 1.3;
     }
 
     /* ─── RESPONSIVE ─── */
@@ -1156,11 +1165,13 @@ function renderStats(main, rcDiv) {
 
   // Bubble: law count × tech count
   const bubbles = sectorCoverage.map(s => {
-    const size = 24 + (s.techCount / maxTech) * 40;
+    const size = 28 + (s.techCount / maxTech) * 32;
+    const fontSize = Math.max(12, size * 0.3);
     return `
       <div class="bubble" onclick="state.activeSector=${s.id};state.view='overview';buildSectorNav();render()" title="${s.name}: ${s.techCount}개 세부기술, ${s.lawCount}개 법령">
-        <div class="bubble-circle" style="width:${size}px;height:${size}px;border-color:${getLawColor(LAW_KEYS[s.lawCount-1]||'strategic')};background:${getLawColor(LAW_KEYS[s.lawCount-1]||'strategic')}22">${s.techCount}</div>
-        <div class="bubble-name">${s.icon} ${s.name}</div>
+        <div class="bubble-circle" style="width:${size}px;height:${size}px;font-size:${fontSize}px;border-color:${getLawColor(LAW_KEYS[s.lawCount-1]||'strategic')};background:${getLawColor(LAW_KEYS[s.lawCount-1]||'strategic')}22">${s.techCount}</div>
+        <div class="bubble-icon">${s.icon}</div>
+        <div class="bubble-name">${s.name}</div>
       </div>
     `;
   }).join('');
