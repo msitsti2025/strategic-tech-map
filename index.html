@@ -974,7 +974,7 @@ function renderDetail(main, rcDiv) {
             }).join('')}
           </div>
         </div>
-        <button class="back-btn" onclick="state.activeSector=null;buildSectorNav();render()">← 목록</button>
+        <button class="back-btn" onclick="state.activeSector=null;render()">← 목록</button>
       </div>
       <div id="subsectors-container"></div>
     </div>
@@ -1029,7 +1029,7 @@ function renderMatrix(main, rcDiv) {
     }).join('');
     const cnt = s.subsectors.reduce((a, ss) => a + ss.items.filter(i => techMatchesFilter(i)).length, 0);
     rows += `
-      <tr style="cursor:pointer" onclick="state.activeSector=${s.id};state.view='overview';buildSectorNav();render()">
+      <tr style="cursor:pointer" onclick="state.activeSector=${s.id};state.view='overview';render()">
         <td class="sector-td">${s.icon} ${s.name}</td>
         ${cells}
         <td style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--accent);text-align:center">${cnt}</td>
@@ -1103,7 +1103,7 @@ function renderStats(main, rcDiv) {
     const size = 28 + (s.techCount / maxTech) * 32;
     const fontSize = Math.max(12, size * 0.3);
     return `
-      <div class="bubble" onclick="state.activeSector=${s.id};state.view='overview';buildSectorNav();render()" title="${s.name}: ${s.techCount}개 세부기술, ${s.lawCount}개 법령">
+      <div class="bubble" onclick="state.activeSector=${s.id};state.view='overview';render()" title="${s.name}: ${s.techCount}개 세부기술, ${s.lawCount}개 법령">
         <div class="bubble-circle" style="width:${size}px;height:${size}px;font-size:${fontSize}px;border-color:${getLawColor(LAW_KEYS[s.lawCount-1]||'strategic')};background:${getLawColor(LAW_KEYS[s.lawCount-1]||'strategic')}22">${s.techCount}</div>
         <div class="bubble-icon">${s.icon}</div>
         <div class="bubble-name">${s.name}</div>
@@ -1266,7 +1266,7 @@ function renderSearch(main, rcDiv) {
       `<span class="tl-pill tl-${LAW_CLASSES[k]}">${LAW_SHORT[k]}</span>`
     ).join('');
     return `
-      <div class="search-result-item" onclick="state.activeSector=${r.sector.id};state.searchQuery='';document.getElementById('search-input').value='';state.view='overview';buildSectorNav();render()">
+      <div class="search-result-item" onclick="state.activeSector=${r.sector.id};state.searchQuery='';document.getElementById('search-input').value='';state.view='overview';render()">
         <div class="sri-sector">${r.sector.icon} ${r.sector.name}</div>
         <div class="sri-name">${name}</div>
         <div class="tech-laws">${pills}</div>
