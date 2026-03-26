@@ -366,6 +366,7 @@
       display: flex;
       flex-direction: column;
       gap: 16px;
+      max-width: 900px;
     }
 
     .sector-header {
@@ -374,18 +375,15 @@
       border-radius: 12px;
       padding: 20px 24px;
       display: flex;
-      align-items: flex-start;
-      gap: 20px;
+      flex-direction: column;
+      gap: 10px;
     }
 
     .sector-header-icon { font-size: 40px; }
 
-    .sector-header-info { flex: 1; }
-
     .sector-header-name {
       font-size: 22px;
       font-weight: 900;
-      margin-bottom: 8px;
     }
 
     .law-badges {
@@ -440,8 +438,8 @@
 
     .tech-row {
       display: flex;
-      align-items: center;
-      gap: 10px;
+      flex-direction: column;
+      gap: 6px;
       padding: 10px 12px;
       border-radius: 8px;
       border: 1px solid transparent;
@@ -454,6 +452,7 @@
       flex: 1;
       font-size: 13px;
       line-height: 1.4;
+      word-break: keep-all;
     }
 
     .tech-laws {
@@ -963,20 +962,19 @@ function renderDetail(main, rcDiv) {
   main.innerHTML = `
     <div class="sector-detail">
       <div class="sector-header">
-        <div class="sector-header-icon">${sector.icon}</div>
-        <div class="sector-header-info">
+        <div style="display:flex;align-items:center;gap:16px">
+          <div class="sector-header-icon">${sector.icon}</div>
           <div class="sector-header-name">No.${sector.id} ${sector.name}</div>
-          <div class="law-badges">${badges}</div>
-          <div style="margin-top:10px;display:grid;grid-template-columns:repeat(5,1fr);gap:8px;font-size:11px;color:var(--text-dim)">
-            ${LAW_KEYS.map(k => {
-              const val = sector.laws[k];
-              return `<div><div style="font-size:10px;margin-bottom:2px;color:${getLawColor(k)}">${LAW_SHORT[k]}</div>${val || '-'}</div>`;
-            }).join('')}
-          </div>
+          <button class="back-btn" onclick="state.activeSector=null;render()">← 목록</button>
         </div>
-        <button class="back-btn" onclick="state.activeSector=null;render()">← 목록</button>
+        <div class="law-badges">${badges}</div>
+        <div style="display:flex;flex-wrap:wrap;gap:8px;font-size:11px;color:var(--text-dim);word-break:keep-all">
+          ${LAW_KEYS.filter(k => sector.laws[k]).map(k => {
+            return `<div style="padding:6px 10px;border-radius:6px;border:1px solid var(--border)"><div style="font-size:10px;margin-bottom:2px;color:${getLawColor(k)}">${LAW_SHORT[k]}</div>${sector.laws[k]}</div>`;
+          }).join('')}
+        </div>
       </div>
-      <div id="subsectors-container"></div>
+      <div id="subsectors-container" style="display:flex;flex-direction:column;gap:12px"></div>
     </div>
   `;
 
@@ -989,7 +987,6 @@ function renderDetail(main, rcDiv) {
     block.innerHTML = `
       <div class="subsector-title">
         <span>▸</span>${ss.name}
-        <span style="margin-left:auto;font-size:10px;font-weight:400;color:var(--text-dim)">${visibleItems.length}개</span>
       </div>
       <div class="subsector-items"></div>
     `;
