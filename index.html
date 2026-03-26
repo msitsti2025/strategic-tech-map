@@ -101,7 +101,7 @@
     /* ─── LAYOUT ─── */
     .app {
       display: grid;
-      grid-template-columns: 280px 1fr;
+      grid-template-columns: 240px 1fr;
       grid-template-rows: auto 1fr;
       min-height: calc(100vh - 68px);
     }
@@ -233,50 +233,20 @@
     }
 
     /* ─── CONTROL BAR ─── */
-    .control-bar {
-      background: var(--bg2);
-      border-bottom: 1px solid var(--border);
-      padding: 12px 24px;
-      display: flex;
-      align-items: center;
-      gap: 16px;
-    }
-
-    .result-count {
-      font-size: 12px;
-      color: var(--text-dim);
-    }
-
-    .result-count strong {
-      color: var(--accent);
-      font-family: 'JetBrains Mono', monospace;
-    }
-
-    .tag-list {
-      display: flex;
-      gap: 6px;
-      flex-wrap: wrap;
-      flex: 1;
-    }
-
-    .tag {
-      font-size: 10px;
-      padding: 3px 8px;
-      border-radius: 4px;
-      border: 1px solid;
-      cursor: pointer;
-    }
-
-    .tag-a { background: var(--law-a-bg); border-color: var(--law-a); color: #93c5fd; }
-    .tag-b { background: var(--law-b-bg); border-color: var(--law-b); color: #c4b5fd; }
-    .tag-c { background: var(--law-c-bg); border-color: var(--law-c); color: #6ee7b7; }
-    .tag-d { background: var(--law-d-bg); border-color: var(--law-d); color: #fca5a5; }
     .tag-e { background: var(--law-e-bg); border-color: var(--law-e); color: #9ca3af; }
 
     /* ─── MAIN CONTENT ─── */
     main {
       padding: 24px;
       overflow-y: auto;
+    }
+
+    @media (min-width: 1340px) {
+      main > * {
+        max-width: 1100px;
+        margin-left: auto;
+        margin-right: auto;
+      }
     }
 
     /* ─── OVERVIEW VIEW ─── */
@@ -480,7 +450,6 @@
     .matrix-wrap {
       overflow: hidden;
       overflow-x: auto;
-      max-width: calc(100vw - 32px);
       border-radius: 12px;
       border: 1px solid var(--border);
     }
@@ -488,12 +457,12 @@
     .matrix-table {
       border-collapse: collapse;
       width: 100%;
-      min-width: 700px;
+      min-width: 500px;
       font-size: 12px;
     }
 
     .matrix-table th {
-      padding: 10px 14px;
+      padding: 8px 6px;
       background: var(--bg3);
       border: 1px solid var(--border);
       font-weight: 700;
@@ -508,7 +477,7 @@
     .matrix-table tr td:first-child, .matrix-table tr th:first-child { border-left: none; }
     .matrix-table tr td:last-child, .matrix-table tr th:last-child { border-right: none; }
 
-    .matrix-table th.law-th { font-size: 11px; min-width: 40px; padding: 10px 14px; }
+    .matrix-table th.law-th { font-size: 11px; min-width: 32px; padding: 8px 4px; width: 1%; }
     .matrix-table th:nth-child(2) { color: #93c5fd; }
     .matrix-table th:nth-child(3) { color: #c4b5fd; }
     .matrix-table th:nth-child(4) { color: #6ee7b7; }
@@ -516,7 +485,7 @@
     .matrix-table th:nth-child(6) { color: #9ca3af; }
 
     .matrix-table td {
-      padding: 9px 14px;
+      padding: 8px 6px;
       border: 1px solid var(--border);
       vertical-align: middle;
     }
@@ -527,6 +496,7 @@
       font-weight: 700;
       font-size: 13px;
       white-space: nowrap;
+      width: 1%;
     }
 
     .matrix-cell-yes {
@@ -708,6 +678,9 @@
       .law-chip-count { margin-left: 0; font-size: 10px; }
       .law-dot { width: 8px; height: 8px; }
       .matrix-table th.law-th { writing-mode: vertical-rl; padding: 14px 8px; }
+      .overview-grid { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); }
+      main { padding: 16px; }
+      header { padding: 12px 16px; }
     }
 
     /* scrollbar */
@@ -784,11 +757,6 @@
   </sidebar>
 
   <div style="display:flex; flex-direction:column;">
-    <!-- Control bar -->
-    <div class="control-bar">
-      <div class="result-count" id="result-count"></div>
-    </div>
-
     <!-- Main -->
     <main id="main-content"></main>
   </div>
@@ -918,30 +886,27 @@ function applyLawHighlight() {
 // ─── RENDER ───
 function render() {
   const main = document.getElementById('main-content');
-  const rcDiv = document.getElementById('result-count');
   const isDetail = state.activeSector && state.view === 'overview';
   document.querySelectorAll('.view-btn').forEach((b, i) => {
     b.classList.toggle('active', !isDetail && ['overview','matrix','stats'][i] === state.view);
   });
 
   if (state.searchQuery.length >= 1) {
-    renderSearch(main, rcDiv);
-  } else if (state.activeSector && state.view === 'overview') {
-    renderDetail(main, rcDiv);
+    renderSearch(main);
+  } else if (isDetail) {
+    renderDetail(main);
   } else if (state.view === 'matrix') {
-    renderMatrix(main, rcDiv);
+    renderMatrix(main);
   } else if (state.view === 'stats') {
-    renderStats(main, rcDiv);
+    renderStats(main);
   } else {
-    renderOverview(main, rcDiv);
+    renderOverview(main);
   }
   applyLawHighlight();
 }
 
-function renderOverview(main, rcDiv) {
+function renderOverview(main) {
   const sectors = TECH_DATA.sectors.filter(s => sectorMatchesFilter(s));
-  const totalTechs = sectors.reduce((a, s) => a + s.subsectors.reduce((a2, ss) => a2 + ss.items.filter(i => techMatchesFilter(i)).length, 0), 0);
-  rcDiv.innerHTML = `분류 · <strong>${sectors.length}</strong>개 분야 · <strong>${totalTechs}</strong>개 세부기술`;
 
   main.innerHTML = `<div class="overview-grid" id="cards-grid"></div>`;
   const grid = document.getElementById('cards-grid');
@@ -972,12 +937,9 @@ function renderOverview(main, rcDiv) {
   });
 }
 
-function renderDetail(main, rcDiv) {
+function renderDetail(main) {
   const sector = TECH_DATA.sectors.find(s => s.id === state.activeSector);
   if (!sector) return;
-
-  const filteredTechs = sector.subsectors.flatMap(ss => ss.items.filter(i => techMatchesFilter(i)));
-  rcDiv.innerHTML = `<strong>${sector.icon} ${sector.name}</strong> · 세부기술 <strong>${filteredTechs.length}</strong>개`;
 
   const coverage = sectorLawCoverage(sector);
   const badges = LAW_KEYS.filter(k => coverage.has(k)).map(k => {
@@ -1034,9 +996,8 @@ function renderDetail(main, rcDiv) {
   });
 }
 
-function renderMatrix(main, rcDiv) {
+function renderMatrix(main) {
   const sectors = TECH_DATA.sectors.filter(s => sectorMatchesFilter(s));
-  rcDiv.innerHTML = `매트릭스 · <strong>${sectors.length}</strong>개 분야 · <strong>5</strong>개 법령`;
 
   const lawHeaders = LAW_KEYS.map(k =>
     `<th class="law-th">${LAW_SHORT[k]}</th>`
@@ -1077,8 +1038,7 @@ function renderMatrix(main, rcDiv) {
   `;
 }
 
-function renderStats(main, rcDiv) {
-  rcDiv.innerHTML = `통계 · <strong>${countTechs()}</strong>개 세부기술`;
+function renderStats(main) {
 
   // Compute per-law sector coverage counts
   const lawSectorCounts = {};
@@ -1256,7 +1216,7 @@ function highlightToken(text, siName, token) {
   return chars.slice(0, start).join('') + '<mark>' + chars.slice(start, end).join('') + '</mark>' + chars.slice(end).join('');
 }
 
-function renderSearch(main, rcDiv) {
+function renderSearch(main) {
   const origTokens = state.searchQuery.split(/\s+/).filter(t => t.length > 0);
   const krTokens = engToKor(state.searchQuery).split(/\s+/).filter(t => t.length > 0);
   const results = [];
@@ -1272,8 +1232,6 @@ function renderSearch(main, rcDiv) {
       });
     });
   });
-
-  rcDiv.innerHTML = `검색 · "<strong>${state.searchQuery}</strong>" · <strong>${results.length}</strong>개 결과`;
 
   if (results.length === 0) {
     main.innerHTML = `<div class="empty-state"><div class="empty-state-icon">🔍</div><div class="empty-state-text">검색 결과가 없습니다.</div></div>`;
