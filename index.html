@@ -508,7 +508,7 @@
     .matrix-table tr td:first-child, .matrix-table tr th:first-child { border-left: none; }
     .matrix-table tr td:last-child, .matrix-table tr th:last-child { border-right: none; }
 
-    .matrix-table th.law-th { font-size: 11px; writing-mode: vertical-rl; min-width: 40px; padding: 14px 8px; }
+    .matrix-table th.law-th { font-size: 11px; min-width: 40px; padding: 10px 14px; }
     .matrix-table th:nth-child(2) { color: #93c5fd; }
     .matrix-table th:nth-child(3) { color: #c4b5fd; }
     .matrix-table th:nth-child(4) { color: #6ee7b7; }
@@ -707,6 +707,7 @@
       .law-chip-sub { font-size: 9px; }
       .law-chip-count { margin-left: 0; font-size: 10px; }
       .law-dot { width: 8px; height: 8px; }
+      .matrix-table th.law-th { writing-mode: vertical-rl; padding: 14px 8px; }
     }
 
     /* scrollbar */
@@ -918,6 +919,10 @@ function applyLawHighlight() {
 function render() {
   const main = document.getElementById('main-content');
   const rcDiv = document.getElementById('result-count');
+  const isDetail = state.activeSector && state.view === 'overview';
+  document.querySelectorAll('.view-btn').forEach((b, i) => {
+    b.classList.toggle('active', !isDetail && ['overview','matrix','stats'][i] === state.view);
+  });
 
   if (state.searchQuery.length >= 1) {
     renderSearch(main, rcDiv);
@@ -986,7 +991,7 @@ function renderDetail(main, rcDiv) {
         <div style="display:flex;align-items:center;gap:16px">
           <div class="sector-header-icon">${sector.icon}</div>
           <div class="sector-header-name">No.${sector.id} ${sector.name}</div>
-          <button class="back-btn" onclick="state.activeSector=null;render()">← 목록</button>
+          <button class="back-btn" onclick="state.activeSector=null;state.view='overview';render()">← 목록</button>
         </div>
         <div class="law-badges">${badges}</div>
         <div style="display:flex;flex-wrap:wrap;gap:8px;font-size:11px;color:var(--text-dim);word-break:keep-all">
