@@ -1197,14 +1197,69 @@ function renderStats(main, rcDiv) {
   `;
 }
 
+// ─── 초성검색 ───
+const CHOSUNG = ['ㄱ','ㄲ','ㄴ','ㄷ','ㄸ','ㄹ','ㅁ','ㅂ','ㅃ','ㅅ','ㅆ','ㅇ','ㅈ','ㅉ','ㅊ','ㅋ','ㅌ','ㅍ','ㅎ'];
+const CHOSUNG_SET = new Set(CHOSUNG);
+
+function getChosung(ch) {
+  const code = ch.charCodeAt(0);
+  if (code >= 0xAC00 && code <= 0xD7A3) return CHOSUNG[Math.floor((code - 0xAC00) / 588)];
+  return null;
+}
+
+function searchMatchIndex(text, query) {
+  const qChars = [...query.replace(/\s/g, '')];
+  if (qChars.length === 0) return -1;
+  const entries = [];
+  [...text].forEach((ch, i) => { if (ch !== ' ') entries.push({ ch, idx: i }); });
+  for (let i = 0; i <= entries.length - qChars.length; i++) {
+    let ok = true;
+    for (let j = 0; j < qChars.length; j++) {
+      const tc = entries[i + j].ch;
+      const qc = qChars[j];
+      if (CHOSUNG_SET.has(qc)) {
+        const cho = getChosung(tc);
+        if (cho !== qc) { ok = false; break; }
+      } else if (tc.toLowerCase() !== qc.toLowerCase()) { ok = false; break; }
+    }
+    if (ok) return i;
+  }
+  return -1;
+}
+
+function highlightMatch(text, query) {
+  const qChars = [...query.replace(/\s/g, '')];
+  if (qChars.length === 0) return text;
+  const textChars = [...text];
+  const entries = [];
+  textChars.forEach((ch, i) => { if (ch !== ' ') entries.push({ ch, idx: i }); });
+  for (let i = 0; i <= entries.length - qChars.length; i++) {
+    let ok = true;
+    for (let j = 0; j < qChars.length; j++) {
+      const tc = entries[i + j].ch;
+      const qc = qChars[j];
+      if (CHOSUNG_SET.has(qc)) {
+        const cho = getChosung(tc);
+        if (cho !== qc) { ok = false; break; }
+      } else if (tc.toLowerCase() !== qc.toLowerCase()) { ok = false; break; }
+    }
+    if (ok) {
+      const start = entries[i].idx;
+      const end = entries[i + qChars.length - 1].idx + 1;
+      return textChars.slice(0, start).join('') + '<mark>' + textChars.slice(start, end).join('') + '</mark>' + textChars.slice(end).join('');
+    }
+  }
+  return text;
+}
+
 function renderSearch(main, rcDiv) {
-  const q = state.searchQuery.toLowerCase();
+  const q = state.searchQuery;
   const results = [];
   TECH_DATA.sectors.forEach(s => {
     s.subsectors.forEach(ss => {
       ss.items.forEach(item => {
         if (!techMatchesFilter(item)) return;
-        if (item.name.toLowerCase().includes(q) || ss.name.toLowerCase().includes(q)) {
+        if (searchMatchIndex(item.name, q) >= 0 || searchMatchIndex(ss.name, q) >= 0) {
           results.push({ sector: s, subsector: ss, item });
         }
       });
@@ -1219,14 +1274,13 @@ function renderSearch(main, rcDiv) {
   }
 
   const html = results.map(r => {
-    const highlight = (s) => s.replace(new RegExp(`(${q})`, 'gi'), '<mark>$1</mark>');
     const pills = LAW_KEYS.filter(k => r.item.laws[k] && state.activeLaws.has(k)).map(k =>
       `<span class="tl-pill tl-${LAW_CLASSES[k]}">${LAW_SHORT[k]}</span>`
     ).join('');
     return `
       <div class="search-result-item" onclick="state.activeSector=${r.sector.id};state.searchQuery='';document.getElementById('search-input').value='';state.view='overview';buildSectorNav();render()">
         <div class="sri-sector">${r.sector.icon} ${r.sector.name}</div>
-        <div class="sri-name">${highlight(r.item.name)}</div>
+        <div class="sri-name">${highlightMatch(r.item.name, q)}</div>
         <div class="tech-laws">${pills}</div>
       </div>
     `;
