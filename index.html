@@ -667,8 +667,8 @@
 
     .bubble-chart {
       display: flex;
-      flex-wrap: nowrap;
-      gap: 6px;
+      flex-wrap: wrap;
+      gap: 12px 6px;
       align-items: flex-start;
       justify-content: center;
     }
@@ -679,8 +679,7 @@
       align-items: center;
       cursor: pointer;
       transition: transform 0.2s;
-      flex: 1 1 0;
-      min-width: 0;
+      min-width: 64px;
     }
 
     .bubble:hover { transform: scale(1.08); }
