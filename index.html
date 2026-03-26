@@ -1197,69 +1197,66 @@ function renderStats(main, rcDiv) {
   `;
 }
 
-// ─── 초성검색 ───
+// ─── 초성검색 (전처리 기반) ───
 const CHOSUNG = ['ㄱ','ㄲ','ㄴ','ㄷ','ㄸ','ㄹ','ㅁ','ㅂ','ㅃ','ㅅ','ㅆ','ㅇ','ㅈ','ㅉ','ㅊ','ㅋ','ㅌ','ㅍ','ㅎ'];
 const CHOSUNG_SET = new Set(CHOSUNG);
 
-function getChosung(ch) {
-  const code = ch.charCodeAt(0);
-  if (code >= 0xAC00 && code <= 0xD7A3) return CHOSUNG[Math.floor((code - 0xAC00) / 588)];
-  return null;
+function toChosung(ch) {
+  const c = ch.charCodeAt(0);
+  return (c >= 0xAC00 && c <= 0xD7A3) ? CHOSUNG[(c - 0xAC00) / 588 | 0] : null;
 }
 
-function searchMatchIndex(text, query) {
-  const qChars = [...query.replace(/\s/g, '')];
-  if (qChars.length === 0) return -1;
-  const entries = [];
-  [...text].forEach((ch, i) => { if (ch !== ' ') entries.push({ ch, idx: i }); });
-  for (let i = 0; i <= entries.length - qChars.length; i++) {
-    let ok = true;
-    for (let j = 0; j < qChars.length; j++) {
-      const tc = entries[i + j].ch;
-      const qc = qChars[j];
-      if (CHOSUNG_SET.has(qc)) {
-        const cho = getChosung(tc);
-        if (cho !== qc) { ok = false; break; }
-      } else if (tc.toLowerCase() !== qc.toLowerCase()) { ok = false; break; }
-    }
-    if (ok) return i;
-  }
-  return -1;
+function buildSearchIndex(text) {
+  const chars = [...text];
+  const cho = [], choIdx = [], norm = [], normIdx = [];
+  chars.forEach((ch, i) => {
+    if (ch === ' ') return;
+    norm.push(ch.toLowerCase()); normIdx.push(i);
+    const c = toChosung(ch);
+    if (c) { cho.push(c); choIdx.push(i); }
+  });
+  return { cho: cho.join(''), choIdx, norm: norm.join(''), normIdx };
 }
 
-function highlightMatch(text, query) {
-  const qChars = [...query.replace(/\s/g, '')];
-  if (qChars.length === 0) return text;
-  const textChars = [...text];
-  const entries = [];
-  textChars.forEach((ch, i) => { if (ch !== ' ') entries.push({ ch, idx: i }); });
-  for (let i = 0; i <= entries.length - qChars.length; i++) {
-    let ok = true;
-    for (let j = 0; j < qChars.length; j++) {
-      const tc = entries[i + j].ch;
-      const qc = qChars[j];
-      if (CHOSUNG_SET.has(qc)) {
-        const cho = getChosung(tc);
-        if (cho !== qc) { ok = false; break; }
-      } else if (tc.toLowerCase() !== qc.toLowerCase()) { ok = false; break; }
-    }
-    if (ok) {
-      const start = entries[i].idx;
-      const end = entries[i + qChars.length - 1].idx + 1;
-      return textChars.slice(0, start).join('') + '<mark>' + textChars.slice(start, end).join('') + '</mark>' + textChars.slice(end).join('');
-    }
-  }
-  return text;
+function queryToChosung(q) {
+  return [...q].map(ch => CHOSUNG_SET.has(ch) ? ch : (toChosung(ch) || '')).join('');
+}
+
+function hasAnyChosung(q) {
+  return [...q].some(ch => CHOSUNG_SET.has(ch));
+}
+
+// 전처리: 아이템별 검색 인덱스 생성
+TECH_DATA.sectors.forEach(s => s.subsectors.forEach(ss => ss.items.forEach(item => {
+  item._si = buildSearchIndex(item.name + ' ' + ss.name);
+  item._siName = buildSearchIndex(item.name);
+})));
+
+function tokenMatch(si, token) {
+  if (hasAnyChosung(token)) return si.cho.indexOf(queryToChosung(token));
+  return si.norm.indexOf(token.toLowerCase());
+}
+
+function highlightToken(text, siName, token) {
+  const isC = hasAnyChosung(token);
+  const key = isC ? 'cho' : 'norm';
+  const idxMap = isC ? siName.choIdx : siName.normIdx;
+  const q = isC ? queryToChosung(token) : token.toLowerCase();
+  const pos = siName[key].indexOf(q);
+  if (pos < 0) return null;
+  const chars = [...text];
+  const start = idxMap[pos], end = idxMap[pos + q.length - 1] + 1;
+  return chars.slice(0, start).join('') + '<mark>' + chars.slice(start, end).join('') + '</mark>' + chars.slice(end).join('');
 }
 
 function renderSearch(main, rcDiv) {
-  const q = state.searchQuery;
+  const tokens = state.searchQuery.split(/\s+/).filter(t => t.length > 0);
   const results = [];
   TECH_DATA.sectors.forEach(s => {
     s.subsectors.forEach(ss => {
       ss.items.forEach(item => {
         if (!techMatchesFilter(item)) return;
-        if (searchMatchIndex(item.name, q) >= 0 || searchMatchIndex(ss.name, q) >= 0) {
+        if (tokens.every(t => tokenMatch(item._si, t) >= 0)) {
           results.push({ sector: s, subsector: ss, item });
         }
       });
@@ -1274,13 +1271,18 @@ function renderSearch(main, rcDiv) {
   }
 
   const html = results.map(r => {
+    let name = r.item.name;
+    for (const t of tokens) {
+      const h = highlightToken(name, buildSearchIndex(name), t);
+      if (h) name = h;
+    }
     const pills = LAW_KEYS.filter(k => r.item.laws[k] && state.activeLaws.has(k)).map(k =>
       `<span class="tl-pill tl-${LAW_CLASSES[k]}">${LAW_SHORT[k]}</span>`
     ).join('');
     return `
       <div class="search-result-item" onclick="state.activeSector=${r.sector.id};state.searchQuery='';document.getElementById('search-input').value='';state.view='overview';buildSectorNav();render()">
         <div class="sri-sector">${r.sector.icon} ${r.sector.name}</div>
-        <div class="sri-name">${highlightMatch(r.item.name, q)}</div>
+        <div class="sri-name">${name}</div>
         <div class="tech-laws">${pills}</div>
       </div>
     `;
