@@ -940,7 +940,7 @@ function render() {
 
   // Active tags
   tagDiv.innerHTML = '';
-  state.activeLaws.forEach(k => {
+  LAW_KEYS.filter(k => state.activeLaws.has(k)).forEach(k => {
     const tag = document.createElement('span');
     const cls = LAW_CLASSES[k];
     tag.className = `tag tag-${cls}`;
