@@ -2,7 +2,7 @@
 
 > 19개 국가 전략기술 분야에 적용되는 5개 법령별 분류체계를 탐색·분석하는 인터랙티브 웹 플랫폼
 
-🔗 **Live Demo**: [https://msitsti2025.github.io/strategic-tech-map/](https://github.com)
+🔗 **Live Demo**: [https://msitsti2025.github.io/strategic-tech-map/](https://msitsti2025.github.io/strategic-tech-map/)
 
 ---
 
@@ -42,6 +42,8 @@
 strategic-tech-map/
 ├── index.html    # 메인 앱 (단일 파일)
 ├── data.js       # 전략기술 데이터
+├── map3d.html    # 2026년 정부 R&D 예산 3D 시각화
+├── map3d.json    # 3D 시각화용 데이터
 └── README.md
 ```
 

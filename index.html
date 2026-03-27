@@ -4,6 +4,19 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>국가 전략기술 분류체계 현황맵</title>
+  <meta name="description" content="5개 법률 기반 19개 국가 전략기술 분야의 분류체계를 한눈에 비교·탐색할 수 있는 인터랙티브 현황맵" />
+  <!-- Open Graph -->
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="국가 전략기술 분류체계 현황맵" />
+  <meta property="og:description" content="5개 법률 기반 19개 국가 전략기술 분야의 분류체계를 한눈에 비교·탐색할 수 있는 인터랙티브 현황맵" />
+  <meta property="og:url" content="https://msitsti2025.github.io/strategic-tech-map/" />
+  <meta property="og:image" content="https://msitsti2025.github.io/strategic-tech-map/og-image.png" />
+  <meta property="og:locale" content="ko_KR" />
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="국가 전략기술 분류체계 현황맵" />
+  <meta name="twitter:description" content="5개 법률 기반 19개 국가 전략기술 분야의 분류체계를 한눈에 비교·탐색할 수 있는 인터랙티브 현황맵" />
+  <meta name="twitter:image" content="https://msitsti2025.github.io/strategic-tech-map/og-image.png" />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
   <script src="data.js"></script>
@@ -77,10 +90,11 @@
     .header-stats {
       display: flex;
       gap: 20px;
+      align-items: center;
     }
 
     .hstat {
-      text-align: right;
+      text-align: center;
     }
 
     .hstat-num {
@@ -100,7 +114,7 @@
     /* ─── LAYOUT ─── */
     .app {
       display: grid;
-      grid-template-columns: 280px 1fr;
+      grid-template-columns: 240px 1fr;
       grid-template-rows: auto 1fr;
       min-height: calc(100vh - 68px);
     }
@@ -173,6 +187,11 @@
       font-size: 12px;
     }
 
+    .law-chip-sub {
+      font-size: 10px;
+      opacity: 0.7;
+    }
+
     .law-chip:hover { opacity: 0.85; }
 
     .law-chip.active-a { background: var(--law-a-bg); border-color: var(--law-a); color: #93c5fd; }
@@ -196,35 +215,6 @@
     }
 
     /* Sector list */
-    .sector-list { display: flex; flex-direction: column; gap: 2px; }
-
-    .sector-item {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      padding: 7px 10px;
-      border-radius: 6px;
-      cursor: pointer;
-      transition: all 0.15s;
-      font-size: 12px;
-      color: var(--text-dim);
-      border: 1px solid transparent;
-    }
-
-    .sector-item:hover { background: var(--bg3); color: var(--text); }
-    .sector-item.active { background: #1e3a5f33; border-color: var(--accent); color: var(--accent); }
-
-    .sector-icon { font-size: 14px; width: 20px; text-align: center; }
-
-    .sector-count {
-      margin-left: auto;
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 10px;
-      background: var(--bg3);
-      padding: 1px 5px;
-      border-radius: 4px;
-    }
-
     /* Search */
     .search-wrap {
       position: relative;
@@ -255,51 +245,18 @@
       font-size: 14px;
     }
 
-    /* ─── CONTROL BAR ─── */
-    .control-bar {
-      background: var(--bg2);
-      border-bottom: 1px solid var(--border);
-      padding: 12px 24px;
-      display: flex;
-      align-items: center;
-      gap: 16px;
-    }
-
-    .result-count {
-      font-size: 12px;
-      color: var(--text-dim);
-    }
-
-    .result-count strong {
-      color: var(--accent);
-      font-family: 'JetBrains Mono', monospace;
-    }
-
-    .tag-list {
-      display: flex;
-      gap: 6px;
-      flex-wrap: wrap;
-      flex: 1;
-    }
-
-    .tag {
-      font-size: 10px;
-      padding: 3px 8px;
-      border-radius: 4px;
-      border: 1px solid;
-      cursor: pointer;
-    }
-
-    .tag-a { background: var(--law-a-bg); border-color: var(--law-a); color: #93c5fd; }
-    .tag-b { background: var(--law-b-bg); border-color: var(--law-b); color: #c4b5fd; }
-    .tag-c { background: var(--law-c-bg); border-color: var(--law-c); color: #6ee7b7; }
-    .tag-d { background: var(--law-d-bg); border-color: var(--law-d); color: #fca5a5; }
-    .tag-e { background: var(--law-e-bg); border-color: var(--law-e); color: #9ca3af; }
-
     /* ─── MAIN CONTENT ─── */
     main {
       padding: 24px;
       overflow-y: auto;
+    }
+
+    @media (min-width: 1340px) {
+      main > * {
+        max-width: 1100px;
+        margin-left: auto;
+        margin-right: auto;
+      }
     }
 
     /* ─── OVERVIEW VIEW ─── */
@@ -389,6 +346,7 @@
       display: flex;
       flex-direction: column;
       gap: 16px;
+      max-width: 900px;
     }
 
     .sector-header {
@@ -397,18 +355,15 @@
       border-radius: 12px;
       padding: 20px 24px;
       display: flex;
-      align-items: flex-start;
-      gap: 20px;
+      flex-direction: column;
+      gap: 10px;
     }
 
     .sector-header-icon { font-size: 40px; }
 
-    .sector-header-info { flex: 1; }
-
     .sector-header-name {
       font-size: 22px;
       font-weight: 900;
-      margin-bottom: 8px;
     }
 
     .law-badges {
@@ -463,8 +418,8 @@
 
     .tech-row {
       display: flex;
-      align-items: center;
-      gap: 10px;
+      flex-direction: column;
+      gap: 6px;
       padding: 10px 12px;
       border-radius: 8px;
       border: 1px solid transparent;
@@ -477,6 +432,7 @@
       flex: 1;
       font-size: 13px;
       line-height: 1.4;
+      word-break: keep-all;
     }
 
     .tech-laws {
@@ -502,18 +458,21 @@
 
     /* ─── MATRIX VIEW ─── */
     .matrix-wrap {
+      overflow: hidden;
       overflow-x: auto;
+      border-radius: 12px;
+      border: 1px solid var(--border);
     }
 
     .matrix-table {
       border-collapse: collapse;
       width: 100%;
-      min-width: 700px;
+      min-width: 500px;
       font-size: 12px;
     }
 
     .matrix-table th {
-      padding: 10px 14px;
+      padding: 8px 6px;
       background: var(--bg3);
       border: 1px solid var(--border);
       font-weight: 700;
@@ -521,7 +480,14 @@
       white-space: nowrap;
     }
 
-    .matrix-table th.law-th { font-size: 11px; writing-mode: vertical-rl; min-width: 40px; padding: 14px 8px; }
+    .matrix-table tr:first-child th { border-top: none; }
+    .matrix-table tr:first-child th:first-child { border-left: none; }
+    .matrix-table tr:first-child th:last-child { border-right: none; }
+    .matrix-table tr:last-child td { border-bottom: none; }
+    .matrix-table tr td:first-child, .matrix-table tr th:first-child { border-left: none; }
+    .matrix-table tr td:last-child, .matrix-table tr th:last-child { border-right: none; }
+
+    .matrix-table th.law-th { font-size: 11px; min-width: 32px; padding: 8px 4px; width: 1%; }
     .matrix-table th:nth-child(2) { color: #93c5fd; }
     .matrix-table th:nth-child(3) { color: #c4b5fd; }
     .matrix-table th:nth-child(4) { color: #6ee7b7; }
@@ -529,7 +495,7 @@
     .matrix-table th:nth-child(6) { color: #9ca3af; }
 
     .matrix-table td {
-      padding: 9px 14px;
+      padding: 8px 6px;
       border: 1px solid var(--border);
       vertical-align: middle;
     }
@@ -540,6 +506,7 @@
       font-weight: 700;
       font-size: 13px;
       white-space: nowrap;
+      width: 1%;
     }
 
     .matrix-cell-yes {
@@ -563,31 +530,29 @@
     .check-no { color: #1e293b; font-size: 14px; }
 
     /* ─── SEARCH RESULTS ─── */
-    .search-results { display: flex; flex-direction: column; gap: 8px; }
+    .search-results { display: flex; flex-direction: column; gap: 4px; }
 
     .search-result-item {
-      background: var(--bg2);
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      padding: 14px 16px;
+      padding: 10px 12px;
+      border-radius: 8px;
+      border: 1px solid transparent;
       display: flex;
-      align-items: center;
-      gap: 12px;
+      flex-direction: column;
+      gap: 6px;
       cursor: pointer;
       transition: all 0.15s;
     }
 
-    .search-result-item:hover { border-color: var(--accent); background: var(--bg3); }
+    .search-result-item:hover { background: var(--bg3); border-color: var(--border); }
 
     .sri-sector {
       font-size: 11px;
       color: var(--text-dim);
-      white-space: nowrap;
     }
 
     .sri-name {
-      flex: 1;
       font-size: 13px;
+      word-break: keep-all;
     }
 
     mark {
@@ -668,8 +633,9 @@
     .bubble-chart {
       display: flex;
       flex-wrap: wrap;
-      gap: 8px;
-      align-items: flex-end;
+      gap: 12px 6px;
+      align-items: flex-start;
+      justify-content: center;
     }
 
     .bubble {
@@ -678,6 +644,7 @@
       align-items: center;
       cursor: pointer;
       transition: transform 0.2s;
+      min-width: 64px;
     }
 
     .bubble:hover { transform: scale(1.08); }
@@ -687,19 +654,25 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 10px;
       font-weight: 700;
       font-family: 'JetBrains Mono', monospace;
       color: #fff;
       border: 2px solid;
     }
 
+    .bubble-icon {
+      margin-top: 6px;
+      font-size: 14px;
+      line-height: 1;
+    }
+
     .bubble-name {
-      font-size: 9px;
+      font-size: 11px;
       color: var(--text-dim);
       text-align: center;
-      margin-top: 4px;
-      max-width: 60px;
+      margin-top: 2px;
+      word-break: keep-all;
+      line-height: 1.3;
     }
 
     /* ─── RESPONSIVE ─── */
@@ -707,6 +680,16 @@
       .app { grid-template-columns: 1fr; }
       sidebar { position: relative; height: auto; top: 0; }
       .stats-grid { grid-template-columns: 1fr; }
+      .law-filter { flex-direction: row; flex-wrap: wrap; gap: 4px; }
+      .law-chip { gap: 4px; padding: 5px 8px; border-radius: 6px; font-size: 11px; font-weight: 700; }
+      .law-chip-sub { font-size: 9px; }
+      .law-chip-count { margin-left: 0; font-size: 10px; }
+      .law-dot { width: 8px; height: 8px; }
+      .matrix-table th.law-th { writing-mode: vertical-rl; padding: 14px 8px; }
+      .app { min-height: auto; }
+      .overview-grid { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); }
+      main { padding: 16px; }
+      header { padding: 12px 16px; }
     }
 
     /* scrollbar */
@@ -717,7 +700,7 @@
 
     .empty-state {
       text-align: center;
-      padding: 60px 20px;
+      padding: 40px 20px;
       color: var(--text-dim);
     }
 
@@ -725,8 +708,9 @@
     .empty-state-text { font-size: 14px; }
 
     /* Highlight filter dim */
-    .tech-row.dimmed { opacity: 0.25; }
-    .sector-card.dimmed { opacity: 0.3; }
+    .tech-row.dimmed { opacity: 0.2; }
+    .sector-card, .matrix-table tbody tr, .bubble, .bar-row, .tech-row { transition: opacity 0.3s; }
+    .sector-card.dimmed, .matrix-table tbody tr.dimmed, .bubble.dimmed, .bar-row.dimmed { opacity: 0.2; }
   </style>
 </head>
 <body>
@@ -756,18 +740,18 @@
   <sidebar>
     <!-- Search -->
     <div class="sidebar-section">
-      <div class="sidebar-label">🔍 세부기술 검색</div>
+      <div class="sidebar-label">세부기술 검색</div>
       <div class="search-wrap">
-        <span class="search-icon">⌕</span>
+        <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
         <input type="text" class="search-input" id="search-input" placeholder="기술명 검색..." />
       </div>
     </div>
 
     <!-- View toggle -->
-    <div class="sidebar-section">
+    <div class="sidebar-section" id="view-section">
       <div class="sidebar-label">보기 방식</div>
       <div class="view-btns">
-        <button class="view-btn active" onclick="setView('overview')">카드뷰</button>
+        <button class="view-btn active" onclick="setView('overview')">분류</button>
         <button class="view-btn" onclick="setView('matrix')">매트릭스</button>
         <button class="view-btn" onclick="setView('stats')">통계</button>
       </div>
@@ -779,20 +763,9 @@
       <div class="law-filter" id="law-filters"></div>
     </div>
 
-    <!-- Sector nav -->
-    <div class="sidebar-section">
-      <div class="sidebar-label">기술 분야 (19개)</div>
-      <div class="sector-list" id="sector-nav"></div>
-    </div>
   </sidebar>
 
   <div style="display:flex; flex-direction:column;">
-    <!-- Control bar -->
-    <div class="control-bar">
-      <div class="result-count" id="result-count"></div>
-      <div class="tag-list" id="active-tags"></div>
-    </div>
-
     <!-- Main -->
     <main id="main-content"></main>
   </div>
@@ -804,7 +777,8 @@ let state = {
   view: 'overview',
   activeLaws: new Set(['strategic','tax_strategic','tax_growth','advanced','protection']),
   activeSector: null,
-  searchQuery: ''
+  searchQuery: '',
+  hoveredLaw: null
 };
 
 const LAW_KEYS = ['strategic','tax_strategic','tax_growth','advanced','protection'];
@@ -847,8 +821,7 @@ function sectorMatchesFilter(sector) {
 function init() {
   document.getElementById('h-techs').textContent = countTechs();
   buildLawFilters();
-  buildSectorNav();
-  render();
+    render();
 
   document.getElementById('search-input').addEventListener('input', (e) => {
     state.searchQuery = e.target.value.trim();
@@ -868,14 +841,17 @@ function buildLawFilters() {
     const isActive = state.activeLaws.has(k);
     const el = document.createElement('div');
     el.className = `law-chip ${isActive ? 'active-'+cls : 'inactive'}`;
+    el.title = `${law.name} (${law.sub})`;
     el.innerHTML = `
       <div class="law-dot" style="background:${getLawColor(k)}"></div>
       <div style="line-height:1.3">
         <div style="font-weight:700;font-size:11px">${law.short}</div>
-        <div style="font-size:10px;opacity:0.7">${law.sub}</div>
+        <div class="law-chip-sub">${law.sub}</div>
       </div>
       <div class="law-chip-count">${count}</div>
     `;
+    el.onmouseenter = () => { state.hoveredLaw = k; applyLawHighlight(); };
+    el.onmouseleave = () => { state.hoveredLaw = null; applyLawHighlight(); };
     el.onclick = () => {
       if (state.activeLaws.has(k)) {
         if (state.activeLaws.size > 1) state.activeLaws.delete(k);
@@ -883,42 +859,12 @@ function buildLawFilters() {
         state.activeLaws.add(k);
       }
       buildLawFilters();
-      buildSectorNav();
       render();
     };
     container.appendChild(el);
   });
 }
 
-function buildSectorNav() {
-  const container = document.getElementById('sector-nav');
-  container.innerHTML = '';
-  TECH_DATA.sectors.forEach(s => {
-    const visible = sectorMatchesFilter(s);
-    const el = document.createElement('div');
-    el.className = `sector-item${state.activeSector === s.id ? ' active' : ''}`;
-    const cnt = s.subsectors.reduce((a, ss) => a + ss.items.filter(i => techMatchesFilter(i)).length, 0);
-    el.innerHTML = `
-      <span class="sector-icon">${s.icon}</span>
-      <span>${s.name}</span>
-      <span class="sector-count">${cnt}</span>
-    `;
-    el.style.opacity = visible ? '1' : '0.3';
-    el.onclick = () => {
-      if (state.activeSector === s.id) {
-        state.activeSector = null;
-      } else {
-        state.activeSector = s.id;
-        state.view = 'overview';
-      }
-      state.searchQuery = '';
-      document.getElementById('search-input').value = '';
-      buildSectorNav();
-      render();
-    };
-    container.appendChild(el);
-  });
-}
 
 function setView(v) {
   state.view = v;
@@ -928,51 +874,51 @@ function setView(v) {
   document.querySelectorAll('.view-btn').forEach((b, i) => {
     b.classList.toggle('active', ['overview','matrix','stats'][i] === v);
   });
-  buildSectorNav();
-  render();
+    render();
+}
+
+function applyLawHighlight() {
+  const k = state.hoveredLaw;
+  const all = document.querySelectorAll('.sector-card, .matrix-table tbody tr, .bubble, .bar-row, .tech-row');
+  if (!k) { all.forEach(el => el.classList.remove('dimmed')); return; }
+  document.querySelectorAll('.sector-card, .matrix-table tbody tr, .bubble, .tech-row').forEach(el => {
+    el.classList.toggle('dimmed', !el.dataset.laws?.split(',').includes(k));
+  });
+  document.querySelectorAll('.bar-row[data-law]').forEach(el => {
+    el.classList.toggle('dimmed', el.dataset.law !== k);
+  });
+  document.querySelectorAll('.bar-row[data-laws]').forEach(el => {
+    el.classList.toggle('dimmed', !el.dataset.laws.split(',').includes(k));
+  });
 }
 
 // ─── RENDER ───
 function render() {
   const main = document.getElementById('main-content');
-  const rcDiv = document.getElementById('result-count');
-  const tagDiv = document.getElementById('active-tags');
-
-  // Active tags
-  tagDiv.innerHTML = '';
-  state.activeLaws.forEach(k => {
-    const tag = document.createElement('span');
-    const cls = LAW_CLASSES[k];
-    tag.className = `tag tag-${cls}`;
-    tag.textContent = LAW_SHORT[k];
-    tag.onclick = () => {
-      if (state.activeLaws.size > 1) {
-        state.activeLaws.delete(k);
-        buildLawFilters();
-        buildSectorNav();
-        render();
-      }
-    };
-    tagDiv.appendChild(tag);
+  const isDetail = state.activeSector && state.view === 'overview';
+  const isSearching = state.searchQuery.length >= 1;
+  document.querySelectorAll('.view-btn').forEach((b, i) => {
+    b.classList.toggle('active', !isDetail && ['overview','matrix','stats'][i] === state.view);
   });
+  const viewSection = document.getElementById('view-section');
+  if (viewSection) viewSection.style.display = (isSearching && window.innerWidth <= 900) ? 'none' : '';
 
   if (state.searchQuery.length >= 1) {
-    renderSearch(main, rcDiv);
-  } else if (state.activeSector && state.view === 'overview') {
-    renderDetail(main, rcDiv);
+    renderSearch(main);
+  } else if (isDetail) {
+    renderDetail(main);
   } else if (state.view === 'matrix') {
-    renderMatrix(main, rcDiv);
+    renderMatrix(main);
   } else if (state.view === 'stats') {
-    renderStats(main, rcDiv);
+    renderStats(main);
   } else {
-    renderOverview(main, rcDiv);
+    renderOverview(main);
   }
+  applyLawHighlight();
 }
 
-function renderOverview(main, rcDiv) {
+function renderOverview(main) {
   const sectors = TECH_DATA.sectors.filter(s => sectorMatchesFilter(s));
-  const totalTechs = sectors.reduce((a, s) => a + s.subsectors.reduce((a2, ss) => a2 + ss.items.filter(i => techMatchesFilter(i)).length, 0), 0);
-  rcDiv.innerHTML = `표시 중: <strong>${sectors.length}</strong>개 분야 · <strong>${totalTechs}</strong>개 세부기술`;
 
   main.innerHTML = `<div class="overview-grid" id="cards-grid"></div>`;
   const grid = document.getElementById('cards-grid');
@@ -982,6 +928,7 @@ function renderOverview(main, rcDiv) {
     const filteredCount = s.subsectors.reduce((a, ss) => a + ss.items.filter(i => techMatchesFilter(i)).length, 0);
     const card = document.createElement('div');
     card.className = 'sector-card';
+    card.dataset.laws = LAW_KEYS.filter(k => coverage.has(k)).join(',');
     const dots = LAW_KEYS.map(k => {
       const cls = coverage.has(k) ? `on-${LAW_CLASSES[k]}` : 'off';
       return `<div class="card-dot ${cls}" title="${LAW_SHORT[k]}"></div>`;
@@ -996,19 +943,15 @@ function renderOverview(main, rcDiv) {
     `;
     card.onclick = () => {
       state.activeSector = s.id;
-      buildSectorNav();
-      render();
+            render();
     };
     grid.appendChild(card);
   });
 }
 
-function renderDetail(main, rcDiv) {
+function renderDetail(main) {
   const sector = TECH_DATA.sectors.find(s => s.id === state.activeSector);
   if (!sector) return;
-
-  const filteredTechs = sector.subsectors.flatMap(ss => ss.items.filter(i => techMatchesFilter(i)));
-  rcDiv.innerHTML = `<strong>${sector.icon} ${sector.name}</strong> · 세부기술 <strong>${filteredTechs.length}</strong>개`;
 
   const coverage = sectorLawCoverage(sector);
   const badges = LAW_KEYS.filter(k => coverage.has(k)).map(k => {
@@ -1019,20 +962,19 @@ function renderDetail(main, rcDiv) {
   main.innerHTML = `
     <div class="sector-detail">
       <div class="sector-header">
-        <div class="sector-header-icon">${sector.icon}</div>
-        <div class="sector-header-info">
+        <div style="display:flex;align-items:center;gap:16px">
+          <div class="sector-header-icon">${sector.icon}</div>
           <div class="sector-header-name">No.${sector.id} ${sector.name}</div>
-          <div class="law-badges">${badges}</div>
-          <div style="margin-top:10px;display:grid;grid-template-columns:repeat(5,1fr);gap:8px;font-size:11px;color:var(--text-dim)">
-            ${LAW_KEYS.map(k => {
-              const val = sector.laws[k];
-              return `<div><div style="font-size:10px;margin-bottom:2px;color:${getLawColor(k)}">${LAW_SHORT[k]}</div>${val || '-'}</div>`;
-            }).join('')}
-          </div>
+          <button class="back-btn" onclick="state.activeSector=null;state.view='overview';render()">← 목록</button>
         </div>
-        <button class="back-btn" onclick="state.activeSector=null;buildSectorNav();render()">← 목록</button>
+        <div class="law-badges">${badges}</div>
+        <div style="display:flex;flex-wrap:wrap;gap:8px;font-size:11px;color:var(--text-dim);word-break:keep-all">
+          ${LAW_KEYS.filter(k => sector.laws[k]).map(k => {
+            return `<div style="padding:6px 10px;border-radius:6px;border:1px solid var(--border)"><div style="font-size:10px;margin-bottom:2px;color:${getLawColor(k)}">${LAW_SHORT[k]}</div>${sector.laws[k]}</div>`;
+          }).join('')}
+        </div>
       </div>
-      <div id="subsectors-container"></div>
+      <div id="subsectors-container" style="display:flex;flex-direction:column;gap:12px"></div>
     </div>
   `;
 
@@ -1045,7 +987,6 @@ function renderDetail(main, rcDiv) {
     block.innerHTML = `
       <div class="subsector-title">
         <span>▸</span>${ss.name}
-        <span style="margin-left:auto;font-size:10px;font-weight:400;color:var(--text-dim)">${visibleItems.length}개</span>
       </div>
       <div class="subsector-items"></div>
     `;
@@ -1053,6 +994,7 @@ function renderDetail(main, rcDiv) {
     visibleItems.forEach(item => {
       const row = document.createElement('div');
       row.className = 'tech-row';
+      row.dataset.laws = LAW_KEYS.filter(k => item.laws[k]).join(',');
       const pills = LAW_KEYS.filter(k => item.laws[k] && state.activeLaws.has(k)).map(k =>
         `<span class="tl-pill tl-${LAW_CLASSES[k]}">${LAW_SHORT[k]}</span>`
       ).join('');
@@ -1066,9 +1008,8 @@ function renderDetail(main, rcDiv) {
   });
 }
 
-function renderMatrix(main, rcDiv) {
+function renderMatrix(main) {
   const sectors = TECH_DATA.sectors.filter(s => sectorMatchesFilter(s));
-  rcDiv.innerHTML = `매트릭스 뷰: <strong>${sectors.length}</strong>개 분야 × <strong>5</strong>개 법령`;
 
   const lawHeaders = LAW_KEYS.map(k =>
     `<th class="law-th">${LAW_SHORT[k]}</th>`
@@ -1085,7 +1026,7 @@ function renderMatrix(main, rcDiv) {
     }).join('');
     const cnt = s.subsectors.reduce((a, ss) => a + ss.items.filter(i => techMatchesFilter(i)).length, 0);
     rows += `
-      <tr style="cursor:pointer" onclick="state.activeSector=${s.id};state.view='overview';buildSectorNav();render()">
+      <tr style="cursor:pointer" data-laws="${LAW_KEYS.filter(k => coverage.has(k)).join(',')}" onclick="state.activeSector=${s.id};state.view='overview';render()">
         <td class="sector-td">${s.icon} ${s.name}</td>
         ${cells}
         <td style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--accent);text-align:center">${cnt}</td>
@@ -1109,8 +1050,7 @@ function renderMatrix(main, rcDiv) {
   `;
 }
 
-function renderStats(main, rcDiv) {
-  rcDiv.innerHTML = `통계 · 전체 <strong>${countTechs()}</strong>개 세부기술`;
+function renderStats(main) {
 
   // Compute per-law sector coverage counts
   const lawSectorCounts = {};
@@ -1133,7 +1073,7 @@ function renderStats(main, rcDiv) {
     const pct = Math.round(lawTechCounts[k] / countTechs() * 100);
     const cls = LAW_CLASSES[k];
     return `
-      <div class="bar-row">
+      <div class="bar-row" data-law="${k}">
         <div class="bar-label">${LAW_SHORT[k]}</div>
         <div class="bar-track">
           <div class="bar-fill bar-fill-${cls}" style="width:${pct}%">${lawTechCounts[k]}</div>
@@ -1145,7 +1085,7 @@ function renderStats(main, rcDiv) {
   const sectorBars = sectorCoverage.slice(0,10).map(s => {
     const pct = Math.round(s.techCount / maxTech * 100);
     return `
-      <div class="bar-row">
+      <div class="bar-row" data-laws="${LAW_KEYS.filter(k => s.subsectors.some(ss => ss.items.some(i => i.laws[k]))).join(',')}">
         <div class="bar-label" style="font-size:10px">${s.icon} ${s.name}</div>
         <div class="bar-track">
           <div class="bar-fill bar-fill-a" style="width:${pct}%;background:linear-gradient(90deg,var(--law-a),var(--law-b))">${s.techCount}</div>
@@ -1156,23 +1096,27 @@ function renderStats(main, rcDiv) {
 
   // Bubble: law count × tech count
   const bubbles = sectorCoverage.map(s => {
-    const size = 24 + (s.techCount / maxTech) * 40;
+    const size = 28 + (s.techCount / maxTech) * 32;
+    const fontSize = Math.max(12, size * 0.3);
     return `
-      <div class="bubble" onclick="state.activeSector=${s.id};state.view='overview';buildSectorNav();render()" title="${s.name}: ${s.techCount}개 세부기술, ${s.lawCount}개 법령">
-        <div class="bubble-circle" style="width:${size}px;height:${size}px;border-color:${getLawColor(LAW_KEYS[s.lawCount-1]||'strategic')};background:${getLawColor(LAW_KEYS[s.lawCount-1]||'strategic')}22">${s.techCount}</div>
-        <div class="bubble-name">${s.icon} ${s.name}</div>
+      <div class="bubble" data-laws="${LAW_KEYS.filter(k => s.subsectors.some(ss => ss.items.some(i => i.laws[k]))).join(',')}" onclick="state.activeSector=${s.id};state.view='overview';render()" title="${s.name}: ${s.techCount}개 세부기술, ${s.lawCount}개 법령">
+        <div class="bubble-circle" style="width:${size}px;height:${size}px;font-size:${fontSize}px;border-color:${getLawColor(LAW_KEYS[s.lawCount-1]||'strategic')};background:${getLawColor(LAW_KEYS[s.lawCount-1]||'strategic')}22">${s.techCount}</div>
+        <div class="bubble-icon">${s.icon}</div>
+        <div class="bubble-name">${s.name}</div>
       </div>
     `;
   }).join('');
 
   // Law overlap
-  const both = {};
+  const bothArr = [];
   LAW_KEYS.forEach((k1,i) => LAW_KEYS.slice(i+1).forEach(k2 => {
     const cnt = TECH_DATA.sectors.reduce((a,s) => a + s.subsectors.reduce((a2,ss) => a2 + ss.items.filter(i=>i.laws[k1]&&i.laws[k2]).length, 0), 0);
-    if (cnt > 0) both[`${LAW_SHORT[k1]} + ${LAW_SHORT[k2]}`] = cnt;
+    if (cnt > 0) bothArr.push({ pair: `${LAW_SHORT[k1]} + ${LAW_SHORT[k2]}`, keys: `${k1},${k2}`, cnt });
   }));
-  const overlapRows = Object.entries(both).sort((a,b)=>b[1]-a[1]).slice(0,6).map(([pair, cnt]) =>
-    `<div class="bar-row"><div class="bar-label" style="width:200px;font-size:10px">${pair}</div><div class="bar-track"><div class="bar-fill bar-fill-b" style="width:${cnt/maxTech*100}%">${cnt}</div></div></div>`
+  bothArr.sort((a,b) => b.cnt - a.cnt);
+  const maxOverlap = bothArr.length > 0 ? bothArr[0].cnt : 1;
+  const overlapRows = bothArr.map(({ pair, keys, cnt }) =>
+    `<div class="bar-row" data-laws="${keys}"><div class="bar-label" style="width:200px;font-size:10px">${pair}</div><div class="bar-track"><div class="bar-fill bar-fill-b" style="width:${cnt/maxOverlap*100}%">${cnt}</div></div></div>`
   ).join('');
 
   main.innerHTML = `
@@ -1197,21 +1141,88 @@ function renderStats(main, rcDiv) {
   `;
 }
 
-function renderSearch(main, rcDiv) {
-  const q = state.searchQuery.toLowerCase();
+// ─── 자모 정규화 검색 ───
+const EN2KR = {q:'ㅂ',w:'ㅈ',e:'ㄷ',r:'ㄱ',t:'ㅅ',y:'ㅛ',u:'ㅕ',i:'ㅑ',o:'ㅐ',p:'ㅔ',a:'ㅁ',s:'ㄴ',d:'ㅇ',f:'ㄹ',g:'ㅎ',h:'ㅗ',j:'ㅓ',k:'ㅏ',l:'ㅣ',z:'ㅋ',x:'ㅌ',c:'ㅊ',v:'ㅍ',b:'ㅠ',n:'ㅜ',m:'ㅡ'};
+const CHO_S = 'ㄱㄲㄴㄷㄸㄹㅁㅂㅃㅅㅆㅇㅈㅉㅊㅋㅌㅍㅎ';
+const JUNG_S = 'ㅏㅐㅑㅒㅓㅔㅕㅖㅗㅘㅙㅚㅛㅜㅝㅞㅟㅠㅡㅢㅣ';
+const JONG_S = '\0ㄱㄲㄳㄴㄵㄶㄷㄹㄺㄻㄼㄽㄾㄿㅀㅁㅂㅄㅅㅆㅇㅈㅊㅋㅌㅍㅎ';
+const DCJ = {'ㅘ':'ㅗㅏ','ㅙ':'ㅗㅐ','ㅚ':'ㅗㅣ','ㅝ':'ㅜㅓ','ㅞ':'ㅜㅔ','ㅟ':'ㅜㅣ','ㅢ':'ㅡㅣ'};
+const DSK = {'ㄳ':'ㄱㅅ','ㄵ':'ㄴㅈ','ㄶ':'ㄴㅎ','ㄺ':'ㄹㄱ','ㄻ':'ㄹㅁ','ㄼ':'ㄹㅂ','ㄽ':'ㄹㅅ','ㄾ':'ㄹㅌ','ㄿ':'ㄹㅍ','ㅀ':'ㄹㅎ','ㅄ':'ㅂㅅ'};
+
+function toJamo(text) {
+  const jamo = [], map = [];
+  [...text].forEach((ch, i) => {
+    if (ch === ' ') return;
+    const code = ch.charCodeAt(0);
+    if (code >= 0xAC00 && code <= 0xD7A3) {
+      const off = code - 0xAC00;
+      const cho = CHO_S[off / 588 | 0];
+      const jung = JUNG_S[(off % 588) / 28 | 0];
+      const jongIdx = off % 28;
+      jamo.push(cho); map.push(i);
+      for (const j of (DCJ[jung] || jung)) { jamo.push(j); map.push(i); }
+      if (jongIdx > 0) {
+        const jong = JONG_S[jongIdx];
+        for (const j of (DSK[jong] || jong)) { jamo.push(j); map.push(i); }
+      }
+    } else if (CHO_S.includes(ch) || JUNG_S.includes(ch)) {
+      jamo.push(ch); map.push(i);
+    } else {
+      const mapped = EN2KR[ch.toLowerCase()];
+      if (mapped) { jamo.push(mapped); map.push(i); }
+      else { jamo.push(ch.toLowerCase()); map.push(i); }
+    }
+  });
+  return { jamo: jamo.join(''), map };
+}
+
+function jamoSubseq(target, query) {
+  let ti = 0;
+  const positions = [];
+  for (const qc of [...query]) {
+    const idx = target.indexOf(qc, ti);
+    if (idx < 0) return null;
+    positions.push(idx);
+    ti = idx + 1;
+  }
+  return positions;
+}
+
+// 전처리
+TECH_DATA.sectors.forEach(s => s.subsectors.forEach(ss => ss.items.forEach(item => {
+  item._jamo = toJamo(item.name + ' ' + ss.name);
+  item._jamoName = toJamo(item.name);
+})));
+
+function highlightJamo(text, jamoInfo, queryJamo) {
+  const positions = jamoSubseq(jamoInfo.jamo, queryJamo);
+  if (!positions) return null;
+  const highlighted = new Set(positions.map(p => jamoInfo.map[p]));
+  const chars = [...text];
+  let result = '', inMark = false;
+  for (let i = 0; i < chars.length; i++) {
+    if (highlighted.has(i) && !inMark) { result += '<mark>'; inMark = true; }
+    else if (!highlighted.has(i) && inMark) { result += '</mark>'; inMark = false; }
+    result += chars[i];
+  }
+  if (inMark) result += '</mark>';
+  return result;
+}
+
+function renderSearch(main) {
+  const tokens = state.searchQuery.split(/\s+/).filter(t => t.length > 0);
+  const tokenJamos = tokens.map(t => toJamo(t).jamo);
   const results = [];
   TECH_DATA.sectors.forEach(s => {
     s.subsectors.forEach(ss => {
       ss.items.forEach(item => {
         if (!techMatchesFilter(item)) return;
-        if (item.name.toLowerCase().includes(q) || ss.name.toLowerCase().includes(q)) {
+        if (tokenJamos.every(tj => jamoSubseq(item._jamo.jamo, tj) !== null)) {
           results.push({ sector: s, subsector: ss, item });
         }
       });
     });
   });
-
-  rcDiv.innerHTML = `검색 "<strong>${state.searchQuery}</strong>" · <strong>${results.length}</strong>개 결과`;
 
   if (results.length === 0) {
     main.innerHTML = `<div class="empty-state"><div class="empty-state-icon">🔍</div><div class="empty-state-text">검색 결과가 없습니다.</div></div>`;
@@ -1219,14 +1230,18 @@ function renderSearch(main, rcDiv) {
   }
 
   const html = results.map(r => {
-    const highlight = (s) => s.replace(new RegExp(`(${q})`, 'gi'), '<mark>$1</mark>');
+    let name = r.item.name;
+    for (const tj of tokenJamos) {
+      const h = highlightJamo(name, toJamo(name), tj);
+      if (h) name = h;
+    }
     const pills = LAW_KEYS.filter(k => r.item.laws[k] && state.activeLaws.has(k)).map(k =>
       `<span class="tl-pill tl-${LAW_CLASSES[k]}">${LAW_SHORT[k]}</span>`
     ).join('');
     return `
-      <div class="search-result-item" onclick="state.activeSector=${r.sector.id};state.searchQuery='';document.getElementById('search-input').value='';state.view='overview';buildSectorNav();render()">
+      <div class="search-result-item" onclick="state.activeSector=${r.sector.id};state.searchQuery='';document.getElementById('search-input').value='';state.view='overview';render()">
         <div class="sri-sector">${r.sector.icon} ${r.sector.name}</div>
-        <div class="sri-name">${highlight(r.item.name)}</div>
+        <div class="sri-name">${name}</div>
         <div class="tech-laws">${pills}</div>
       </div>
     `;
